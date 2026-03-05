@@ -9,6 +9,12 @@ const Dashboard = () => {
     const [file, setFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('');
 
+    // New Vuln States
+    const [pingTarget, setPingTarget] = useState('127.0.0.1');
+    const [pingResult, setPingResult] = useState('');
+    const [filePath, setFilePath] = useState('');
+    const [fileContent, setFileContent] = useState('');
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -73,6 +79,26 @@ const Dashboard = () => {
             }
         } catch (err) {
             setUploadStatus('Upload failed');
+        }
+    };
+
+    const handlePing = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.post('http://localhost:5000/api/debug/ping', { ip: pingTarget });
+            setPingResult(res.data.output);
+        } catch (err) {
+            setPingResult('Error: ' + err.message);
+        }
+    };
+
+    const handleReadFile = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.get(`http://localhost:5000/api/debug/read-file?file=${filePath}`);
+            setFileContent(res.data);
+        } catch (err) {
+            setFileContent('Error reading file. Check path.');
         }
     };
 
@@ -156,6 +182,58 @@ const Dashboard = () => {
                     </div>
                     <div className="mt-6 text-sm text-gray-500 italic">
                         Hint: Does the server clean up scripts embedded in your messages before showing them to other users?
+                    </div>
+                </div>
+
+                {/* Network Debugging (Command Injection) */}
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-bold mb-4 border-b pb-2">Network Debug (Ping)</h2>
+                    <form onSubmit={handlePing} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">IP Address or Hostname</label>
+                            <input
+                                type="text"
+                                value={pingTarget}
+                                onChange={(e) => setPingTarget(e.target.value)}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                placeholder="127.0.0.1"
+                            />
+                        </div>
+                        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ping</button>
+                        {pingResult && (
+                            <pre className="mt-4 p-4 bg-gray-900 text-green-400 text-xs overflow-x-auto rounded">
+                                {pingResult}
+                            </pre>
+                        )}
+                    </form>
+                    <div className="mt-6 text-sm text-gray-500 italic">
+                        Hint: What happens if you add a semi-colon (;) or pipe (|) after the IP address and write another command?
+                    </div>
+                </div>
+
+                {/* File Explorer (Path Traversal) */}
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-bold mb-4 border-b pb-2">System File Viewer</h2>
+                    <form onSubmit={handleReadFile} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">File Name</label>
+                            <input
+                                type="text"
+                                value={filePath}
+                                onChange={(e) => setFilePath(e.target.value)}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                placeholder="package.json"
+                            />
+                        </div>
+                        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View Content</button>
+                        {fileContent && (
+                            <pre className="mt-4 p-4 bg-gray-100 text-black text-xs overflow-y-auto max-h-40 rounded border">
+                                {fileContent}
+                            </pre>
+                        )}
+                    </form>
+                    <div className="mt-6 text-sm text-gray-500 italic">
+                        Hint: Can you use relative paths (like `../`) to leave the current directory and read things you shouldn't?
                     </div>
                 </div>
 

@@ -16,4 +16,39 @@ router.get('/', (req, res) => {
     res.json({ success: true, debug: configData });
 });
 
+// Vulnerability 8: Command Injection
+// Executing system commands using user input without sanitization
+const { exec } = require('child_process');
+router.post('/ping', (req, res) => {
+    const ip = req.body.ip;
+
+    // VULNERABLE: Direct concatenation of user input into a shell command!
+    const command = 'ping -c 3 ' + ip;
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            return res.json({ success: false, output: stderr || error.message });
+        }
+        res.json({ success: true, output: stdout });
+    });
+});
+
+// Vulnerability 9: Directory Traversal / Local File Inclusion (LFI)
+// Reading arbitrary files from the filesystem using user-supplied path
+const fs = require('fs');
+const path = require('path');
+router.get('/read-file', (req, res) => {
+    const filename = req.query.file;
+
+    // VULNERABLE: Not validating the path. Allows "cat c:\windows\win.ini" or "../../etc/passwd" equivalents
+    const filePath = path.join(__dirname, '../../', filename);
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Could not read file' });
+        }
+        res.send(data);
+    });
+});
+
 module.exports = router;
