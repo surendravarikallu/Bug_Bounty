@@ -26,6 +26,13 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/debug', debugRoutes);
 
+// Vulnerability 10: Security Misconfiguration (Verbose Errors)
+// Exposing detailed stack traces to the client
+app.get('/api/debug/crash', (req, res) => {
+    // Intentionally throwing an error to see if the server leaks the stack trace
+    throw new Error("Database connection unexpectedly dropped. Query failed at line 42 in User.findById: SELECT * FROM system_users");
+});
+
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 

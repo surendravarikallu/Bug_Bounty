@@ -75,3 +75,28 @@ This guide walks you through exactly how to trigger the seeded vulnerabilities i
 2. Send a GET request to `http://localhost:5000/api/admin/users`.
 3. Ensure you add this custom header to the request: `X-User-Role: admin`
 4. **Result:** Even without a valid JWT token or logging in, the server will dump the entire list of all users in the database to you because you manipulated the header.
+
+---
+
+## 7. Testing No Rate Limiting (Brute Force)
+
+**Location:** Login Page (`/login`)
+**Vulnerability:** The backend does not implement any form of rate limiting on the authentication endpoint.
+**How to exploit:**
+1. Open Burp Suite and capture a failed login request (e.g., trying to log in as `user1`).
+2. Send the captured request to **Intruder**.
+3. Clear the payload positions and highlight just the password field value to set it as the payload position.
+4. Load a small dictionary file (like `rockyou.txt` or a custom list containing `password123`) into the Payloads tab.
+5. Start the attack.
+6. **Result:** The server will process hundreds of requests per second without blocking your IP. You can identify the correct password by looking for the response with a different length or HTTP status code (200 OK vs 401 Unauthorized).
+
+---
+
+## 8. Testing Security Misconfiguration (Verbose Errors)
+
+**Location:** Hidden Debug Route (`/api/debug/crash`)
+**Vulnerability:** The server is configured to return full, unhandled stack traces and internal error messages directly to the client instead of logging them securely and returning a generic 500 status.
+**How to exploit:**
+1. Open up your browser or an API testing tool like Postman.
+2. Send a GET request to `http://localhost:5000/api/debug/crash` (or the deployed URL).
+3. **Result:** The server will throw a simulated database failure error. Instead of a user-friendly "Something went wrong" message, you will receive a raw HTML block or JSON response containing the exact file paths, line numbers, and the specific SQL query (`SELECT * FROM system_users`) that "failed." This exposes internal system architecture to attackers.

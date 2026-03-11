@@ -4,6 +4,8 @@ const pool = require('../config/db');
 
 // Vulnerability 1: SQL Injection
 // Using raw string concatenation instead of parameterized queries
+// Vulnerability X: No Rate Limiting (Brute Force / Dictionary Attacks)
+// This endpoint does not limit the number of failed login attempts.
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
