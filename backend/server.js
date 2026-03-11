@@ -26,6 +26,11 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/debug', debugRoutes);
 
+// Health check endpoint to prevent server from sleeping
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ success: true, message: 'Server is awake and healthy' });
+});
+
 // Vulnerability 10: Security Misconfiguration (Verbose Errors)
 // Exposing detailed stack traces to the client
 app.get('/api/debug/crash', (req, res) => {
