@@ -20,11 +20,11 @@ const Admin = () => {
             // Anyone can intercept this request or modify localStorage to set role='admin'
             const roleHeader = userState?.role || 'user';
 
-            const userRes = await axios.get('http://localhost:5000/api/admin/users', {
+            const userRes = await axios.get('/api/admin/users', {
                 headers: { 'X-User-Role': roleHeader }
             });
 
-            const fileRes = await axios.get('http://localhost:5000/api/admin/files', {
+            const fileRes = await axios.get('/api/admin/files', {
                 headers: { 'X-User-Role': roleHeader }
             });
 
@@ -102,7 +102,7 @@ const Admin = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{f.owner}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{f.filename}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-xs text-blue-600">
-                                                <a href={`http://localhost:5000${f.filepath}`} target="_blank" rel="noreferrer">
+                                                <a href={`${f.filepath}`} target="_blank" rel="noreferrer">
                                                     {f.filepath}
                                                 </a>
                                             </td>

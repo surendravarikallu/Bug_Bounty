@@ -12,7 +12,7 @@ const Login = () => {
         e.preventDefault();
         try {
             // VULNERABLE: Direct posting of values enabling SQL injection.
-            const response = await axios.post('http://localhost:5000/api/auth/login', {
+            const response = await axios.post('/api/auth/login', {
                 username,
                 password
             });

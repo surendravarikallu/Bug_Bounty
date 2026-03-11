@@ -28,7 +28,7 @@ const Dashboard = () => {
     const fetchProfile = async (id) => {
         try {
             // VULNERABLE: Direct reference to ID without verifying it belongs to the logged in session state. (IDOR)
-            const res = await axios.get(`http://localhost:5000/api/profile?id=${id}`);
+            const res = await axios.get(`/api/profile?id=${id}`);
             if (res.data.success) {
                 setProfile(res.data.profile);
             }
@@ -39,7 +39,7 @@ const Dashboard = () => {
 
     const fetchComments = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/comments');
+            const res = await axios.get('/api/comments');
             if (res.data.success) {
                 setComments(res.data.comments);
             }
@@ -51,7 +51,7 @@ const Dashboard = () => {
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/comments', {
+            await axios.post('/api/comments', {
                 userId: user.id,
                 comment: newComment
             });
@@ -71,7 +71,7 @@ const Dashboard = () => {
         formData.append('userId', user.id);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/upload', formData, {
+            const res = await axios.post('/api/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             if (res.data.success) {
@@ -85,7 +85,7 @@ const Dashboard = () => {
     const handlePing = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/debug/ping', { ip: pingTarget });
+            const res = await axios.post('/api/debug/ping', { ip: pingTarget });
             setPingResult(res.data.output);
         } catch (err) {
             setPingResult('Error: ' + err.message);
@@ -95,7 +95,7 @@ const Dashboard = () => {
     const handleReadFile = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.get(`http://localhost:5000/api/debug/read-file?file=${filePath}`);
+            const res = await axios.get(`/api/debug/read-file?file=${filePath}`);
             setFileContent(res.data);
         } catch (err) {
             setFileContent('Error reading file. Check path.');

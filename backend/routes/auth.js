@@ -8,8 +8,13 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // VULNERABLE CODE:
-        const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+        // VULNERABLE CODE (Simplified for 2nd Year CSE):
+        // We use string interpolation, and we do NOT wrap the password in quotes
+        // if the username is doing the bypassing. Alternatively, the simplest fix is 
+        // to just use the classic query and rely on `--` to comment out the rest.
+        // However, to make `admin' OR '1'='1` work directly without comments, we can 
+        // structure it like this:
+        const query = `SELECT * FROM users WHERE username = '${username}' OR password = '${password}'`;
         const result = await pool.query(query);
 
         if (result.rows.length > 0) {

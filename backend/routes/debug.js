@@ -23,7 +23,8 @@ router.post('/ping', (req, res) => {
     const ip = req.body.ip;
 
     // VULNERABLE: Direct concatenation of user input into a shell command!
-    const command = 'ping -c 3 ' + ip;
+    const countFlag = process.platform === 'win32' ? '-n' : '-c';
+    const command = `ping ${countFlag} 3 ${ip}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
