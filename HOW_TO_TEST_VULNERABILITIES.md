@@ -10,7 +10,10 @@ This guide walks you through exactly how to trigger the seeded vulnerabilities i
 **Vulnerability:** The backend directly concatenates your username input into the SQL query without parametrizing it.
 **How to exploit:**
 1. Go to the login page.
-2. In the **Username** field, enter: `admin' OR '1'='1`
+2. In the **Username** field, enter the following payload:
+   ```sql
+   admin' OR '1'='1
+   ```
 3. Enter anything in the **Password** field.
 4. Click Login.
 5. **Result:** You will be logged in as `admin`, bypassing the password check entirely.
@@ -36,7 +39,9 @@ This guide walks you through exactly how to trigger the seeded vulnerabilities i
 **Vulnerability:** The backend saves exactly what you type, and the React frontend renders it using `dangerouslySetInnerHTML`.
 **How to exploit:**
 1. In the comment box, paste the following exact payload:
-   `<img src="x" onerror="alert('XSS triggered! Imagine this stealing your cookies.')" />`
+   ```html
+   <img src="x" onerror="alert('XSS triggered! Imagine this stealing your cookies.')" />
+   ```
 2. Click Post Comment.
 3. **Result:** An alert box will instantly pop up. Every time *any other user* visits the dashboard, that script will execute in their browser!
 
@@ -47,8 +52,17 @@ This guide walks you through exactly how to trigger the seeded vulnerabilities i
 **Location:** Dashboard (Network Debug Ping)
 **Vulnerability:** The backend receives the IP address and concatenates it directly into a standard terminal string: `ping -c 3 ${ip}`. 
 **How to exploit:**
-1. In the Ping Target box, enter this payload: 
-   `127.0.0.1 && dir` (Windows) OR `127.0.0.1; ls -la` (Mac/Linux)
+1. In the Ping Target box, enter one of these payloads: 
+   
+   **For Windows targets:**
+   ```cmd
+   127.0.0.1 && dir
+   ```
+   
+   **For Mac/Linux targets (like Render):**
+   ```bash
+   127.0.0.1; ls -la
+   ```
 2. Click Ping.
 3. **Result:** The system will ping localhost, and *then* execute the `dir/ls` command, returning the entire directory listing of your server to the screen. You have full control of the host machine!
 
@@ -60,7 +74,9 @@ This guide walks you through exactly how to trigger the seeded vulnerabilities i
 **Vulnerability:** The backend looks for a file using `path.join(__dirname, '../../', filename)` without doing any sanitization to prevent moving "up" directories.
 **How to exploit:**
 1. In the File Name box, instead of requesting a normal file like `package.json`, request:
-   `../backend/.env`
+   ```text
+   ../backend/.env
+   ```
 2. Click View Content.
 3. **Result:** You will read the raw contents of your backend's secret `.env` file, exposing database passwords and JWT secrets!
 
